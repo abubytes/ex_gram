@@ -189,6 +189,11 @@ defmodule ExGram.Cast do
       {:error, %ExGram.Error{message: "Failed to resolve subtype for #{inspect(t)}: #{Exception.message(e)}"}}
   end
 
+  # RichText is a String-or-object union (Bot API 10.1): a plain text run is
+  # serialized as a bare JSON string, not an object. Pass it through unchanged
+  # rather than demanding a map.
+  defp apply_subtype(ExGram.Model.RichText, params) when is_binary(params), do: {:ok, params}
+
   defp apply_subtype(t, params) do
     {:error, %ExGram.Error{message: "Expected a map for type #{inspect(t)}, got: #{inspect(params)}"}}
   end
